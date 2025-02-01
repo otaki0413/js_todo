@@ -55,6 +55,71 @@ function toggleTodo(id) {
 }
 
 /**
+ * TODOの編集処理
+ * @param {string} id TODOを特定するユニークID
+ */
+function editTodo(id) {
+  // 既存のTODO取得
+  const todo = todos.find((todo) => todo.id === id)
+  if (todo === undefined) {
+    alert('対象のTODOは見つかりません')
+    return
+  }
+
+  // 既存のTODOのli要素とその関連要素を取得
+  const todoItem = document.getElementById(id)
+  const checkbox = todoItem.querySelector('.todo-checkbox')
+  const todoTextSpan = todoItem.querySelector('.todo-text')
+  const editButton = todoItem.querySelector('.todo-edit-button')
+  if (checkbox === null || todoTextSpan === null || editButton === null) {
+    return
+  }
+
+  // 編集用のinput要素作成
+  const editTodoInput = document.createElement('input')
+  editTodoInput.value = todo.text
+  editTodoInput.classList.add('edit-todo-input')
+
+  // 編集ボタン -> 保存ボタンに変更
+  editButton.textContent = '保存'
+  editButton.classList.remove('todo-edit-button')
+  editButton.classList.add('todo-save-button')
+
+  /**
+   * 保存ボタン押下時のイベントリスナー
+   * MEMO: 参照したい変数が多かったためeditTodo関数内部に関数定義しています
+   */
+  function saveTodo() {
+    // 入力値取得
+    const editTodoText = editTodoInput.value.trim()
+    if (!editTodoText) {
+      alert('タスクを入力してください')
+      return
+    }
+
+    // 既存のTODO更新
+    todo.text = editTodoText
+    todoTextSpan.textContent = editTodoText
+
+    // DOMを元の状態に戻す
+    editTodoInput.replaceWith(todoTextSpan)
+    editButton.textContent = '編集'
+    editButton.classList.remove('todo-save-button')
+    editButton.classList.add('todo-edit-button')
+    editButton.removeEventListener('click', saveTodo)
+    editButton.addEventListener('click', () => editTodo(id))
+  }
+
+  // 編集イベントリスナー削除と保存イベントリスナー登録
+  editButton.removeEventListener('click', () => editTodo(id))
+  editButton.addEventListener('click', saveTodo)
+
+  // span要素をinput要素に置き換え
+  todoTextSpan.replaceWith(editTodoInput)
+  editTodoInput.focus()
+}
+
+/**
  * TODOリストのli要素を生成する処理
  * @param {string} todoText TODOテキスト
  * @param {string} id TODOを特定するユニークID
@@ -78,6 +143,8 @@ function createTodoItemElement(todoText, id) {
   buttonArea.classList.add('todo-button-area')
 
   const editButton = createButton('編集', 'todo-edit-button')
+  editButton.addEventListener('click', () => editTodo(id))
+
   const deleteButton = createButton('削除', 'todo-delete-button')
   buttonArea.append(editButton, deleteButton)
   todoItem.append(checkbox, todoTextSpan, buttonArea)
