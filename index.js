@@ -120,6 +120,26 @@ function editTodo(id) {
 }
 
 /**
+ * TODO削除処理
+ * @param {string} id TODOを特定するユニークID
+ */
+function deleteTodo(id) {
+  const index = todos.findIndex((todo) => todo.id === id)
+  if (index === -1) {
+    alert('対象のTODOは見つかりません')
+    return
+  }
+  const isOK = confirm('本当に削除してもいいですか？')
+  if (isOK) {
+    // 対象のTODO削除
+    todos.splice(index, 1)
+    const todoItem = document.getElementById(id)
+    todoList.removeChild(todoItem)
+    updateCounts()
+  }
+}
+
+/**
  * TODOリストのli要素を生成する処理
  * @param {string} todoText TODOテキスト
  * @param {string} id TODOを特定するユニークID
@@ -146,6 +166,8 @@ function createTodoItemElement(todoText, id) {
   editButton.addEventListener('click', () => editTodo(id))
 
   const deleteButton = createButton('削除', 'todo-delete-button')
+  deleteButton.addEventListener('click', () => deleteTodo(id))
+
   buttonArea.append(editButton, deleteButton)
   todoItem.append(checkbox, todoTextSpan, buttonArea)
 
