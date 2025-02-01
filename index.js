@@ -41,6 +41,20 @@ function addTodo() {
 }
 
 /**
+ * TODOの完了・未完了の切替処理
+ * @param {string} id TODOを特定するユニークID
+ */
+function toggleTodo(id) {
+  const todo = todos.find((todo) => todo.id === id)
+  if (todo === undefined) {
+    alert('対象のTODOは見つかりません')
+    return
+  }
+  todo.completed = !todo.completed
+  updateCounts()
+}
+
+/**
  * TODOリストのli要素を生成する処理
  * @param {string} todoText TODOテキスト
  * @param {string} id TODOを特定するユニークID
@@ -54,6 +68,7 @@ function createTodoItemElement(todoText, id) {
   const checkbox = document.createElement('input')
   checkbox.type = 'checkbox'
   checkbox.classList.add('todo-checkbox')
+  checkbox.addEventListener('change', () => toggleTodo(id))
 
   const todoTextSpan = document.createElement('span')
   todoTextSpan.classList.add('todo-text')
